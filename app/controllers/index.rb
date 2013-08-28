@@ -1,13 +1,30 @@
-get '/' do
-  # Look in app/views/index.erb
+enable :sessions
 
+get '/' do
+  session.clear
   erb :index
 end
 
+get '/logout' do
+  redirect to('/')  
+end
+
+get '/:user_name' do
+  erb :profile
+end
 
 post '/login' do
-  # Look in app/views/index.erb
-   "#{User.authenticate(params[:email], params[:password])}" 
-  
-  # erb :index
+   @user_name = User.authenticate(params[:email], params[:password])
+   session[:user_name] = @user_name
+   if @user_name == nil
+    redirect to('/')
+  else
+    redirect to("/#{@user_name}")
+  end
+end
+
+post '/create' do 
+  User.create(params)
+  session[:user_name]= params[:name]
+  redirect to("/#{params[:name]}")
 end
